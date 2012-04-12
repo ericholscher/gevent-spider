@@ -5,24 +5,8 @@ from urlparse import urlsplit, urljoin
 import requests
 from .utils import timer
 
-def spider(client, url, domain_whitelist=None, pool=None, threadpool=None, tested=None):
+def tail(file):
     client.send_status('Spidering {url}...'.format(url=url))
-
-    domain_whitelist = domain_whitelist or (urlsplit(url).netloc,)
-    threadpool = threadpool or ThreadPool(4) # for lxml - 4 workers
-    pool = pool or Pool() # maximum number of concurrent HTTP requests
-    tested = tested or set([url])
-
-    with timer() as timed:
-        response = requests.get(url)
-
-    result = dict(
-        status_code = response.status_code,
-        length = len(response.text),
-        headers = response.headers,
-        url = url,
-        duration = timed.result(),
-    )
     client.send_result(result)
 
     html = threadpool.apply(fromstring, [response.text])

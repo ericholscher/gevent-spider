@@ -95,7 +95,7 @@
                 var data = JSON.parse(message.data);
                 switch (data.cmd) {
                     case 'status':
-                        $status.html(data.status);
+                        $status.append(data.status);
                         break;
                     case 'result':
                         console.log(data.result);
@@ -115,7 +115,7 @@
             $form.bind('submit', function(e) {
                 e.preventDefault();
                 var url = $url.val();
-                ws.send_json({cmd: 'scrape', url: url});
+                ws.send_json({cmd: 'tail', url: url});
                 //$form.hide()
                 console.log(url);
             });
