@@ -8,11 +8,14 @@ import subprocess
 gevent.monkey.patch_all()
 
 class Client(object):
+
     def __init__(self, websocket, env):
         self.ws = websocket
         self.env = env
+
     def send(self, message):
         self.ws.send(json.dumps(message))
+
     def receive(self):
         data = self.ws.receive()
         try:
@@ -22,10 +25,9 @@ class Client(object):
             print "JSON Error: %s" % e
             return None
         return json_data
+
     def send_status(self, message, id=None):
         self.send({'cmd': 'status', 'status': message, 'id': id})
-    def send_result(self, result):
-        self.send({'cmd': 'result', 'result': result})
 
 def tail_f(file):
     count = 0
@@ -58,9 +60,11 @@ def application(env, start_response):
         if cmd == 'tail':
             line = 0
             #Main Loop
-            file = message['url']
+            file_str = message['url']
+            file_int = int(file_str)
             try:
-                user_file = open(file, 'r')
+                file_path = os.path.join('/tmp', 'docs-build-%s' % file_int)
+                user_file = open(file_path, 'r')
                 for line in tail_f(user_file):
                     client.send_status(line, id=id)
             except Exception, e:
